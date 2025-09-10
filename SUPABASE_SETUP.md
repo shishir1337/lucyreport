@@ -53,6 +53,9 @@ CREATE TRIGGER update_fraud_reports_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Enable real-time for the fraud_reports table
+ALTER PUBLICATION supabase_realtime ADD TABLE fraud_reports;
+
 -- Insert some sample data for testing
 INSERT INTO fraud_reports (name, mobile_number, amount_bdt) VALUES
   ('Mohammad Rahman', '01712345678', 50000.00),

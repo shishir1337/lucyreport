@@ -22,12 +22,12 @@ export function PublicCounter() {
     }),
   })
 
-  // Fetch real data from Supabase
+  // Fetch real data from Supabase and set up real-time subscription
   useEffect(() => {
+    const supabase = createClient()
+    
     const fetchStats = async () => {
       try {
-        const supabase = createClient()
-        
         const { count, error } = await supabase
           .from('fraud_reports')
           .select('*', { count: 'exact', head: true })
@@ -55,7 +55,34 @@ export function PublicCounter() {
       }
     }
 
+    // Initial fetch
     fetchStats()
+
+    // Set up real-time subscription for new reports
+    const channel = supabase
+      .channel('fraud_reports_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'fraud_reports'
+        },
+        (payload) => {
+          console.log('New report received:', payload)
+          // Update the counter immediately when a new report is inserted
+          setStats(prev => ({
+            ...prev,
+            totalReports: prev.totalReports + 1,
+            lastUpdated: new Date().toLocaleString("bn-BD", {
+              timeZone: "Asia/Dhaka",
+              dateStyle: "medium",
+              timeStyle: "short",
+            })
+          }))
+        }
+      )
+      .subscribe()
 
     // Update timestamp every minute
     const interval = setInterval(() => {
@@ -69,7 +96,11 @@ export function PublicCounter() {
       }))
     }, 60000) // Update every minute
 
-    return () => clearInterval(interval)
+    // Cleanup function
+    return () => {
+      clearInterval(interval)
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   return (
@@ -104,7 +135,7 @@ export function PublicCounter() {
             {isLoading ? (
               <Skeleton className="h-3 w-8" />
             ) : (
-              <span className="font-medium tabular-nums">{Math.min(100, Math.round((stats.totalReports / 50) * 100))}%</span>
+              <span className="font-medium tabular-nums">{Math.min(100, Math.round((stats.totalReports / 300) * 100))}%</span>
             )}
           </div>
           <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
@@ -113,7 +144,7 @@ export function PublicCounter() {
             ) : (
               <div
                 className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 ease-out"
-                style={{ width: `${Math.min(100, (stats.totalReports / 50) * 100)}%` }}
+                style={{ width: `${Math.min(100, (stats.totalReports / 300) * 100)}%` }}
               />
             )}
           </div>

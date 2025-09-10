@@ -129,7 +129,7 @@ export default function FraudReportPage() {
               বিমানবন্দর ইমিগ্রেশন রিপোর্ট
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-pretty max-w-sm mx-auto">
-              ফারহানা হক লুসির বিরুদ্ধে আপনার প্রতারণার রিপোর্ট জমা দিন। আপনার তথ্য তাকে দেশ ছেড়ে যেতে বাধা দিতে সাহায্য করবে।
+              ফারহানা হক লুসির বিরুদ্ধে আপনার রিপোর্ট জমা দিন। আপনার তথ্য তাকে দেশ ছেড়ে যেতে বাধা দিতে সাহায্য করবে।
             </p>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function FraudReportPage() {
               <div className="space-y-2">
                 <p id="notice-title" className="text-base font-semibold text-amber-800">গুরুত্বপূর্ণ নোটিশ</p>
                 <p className="text-sm text-amber-700 leading-relaxed text-pretty">
-                  এটি একটি অফিসিয়াল প্রতারণার রিপোর্ট। সমস্ত তথ্য বিমানবন্দর ইমিগ্রেশন কর্তৃপক্ষের কাছে পাঠানো হবে।
+                সাবমিট করা সমস্ত তথ্য বিমানবন্দর ইমিগ্রেশন কর্তৃপক্ষের কাছে পাঠানো হবে।
                 </p>
               </div>
             </div>
@@ -199,7 +199,7 @@ export default function FraudReportPage() {
                 <Input
                   id="mobile"
                   type="tel"
-                  placeholder="01XXXXXXXXX"
+                  placeholder="সক্রিয় মোবাইল নম্বর (০১XXXXXXXXX)"
                   value={formData.mobileNumber}
                   onChange={(e) => handleInputChange("mobileNumber", formatMobileNumber(e.target.value))}
                   className={`h-12 text-base transition-all duration-200 touch-manipulation ${
@@ -226,7 +226,7 @@ export default function FraudReportPage() {
                 <Input
                   id="amount"
                   type="number"
-                  placeholder="টাকার পরিমাণ লিখুন"
+                  placeholder="বৈধ পরিমাণ (টাকা) লিখুন"
                   value={formData.amountBdt}
                   onChange={(e) => handleInputChange("amountBdt", e.target.value)}
                   className={`h-12 text-base transition-all duration-200 touch-manipulation ${
