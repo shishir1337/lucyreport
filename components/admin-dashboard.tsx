@@ -4,12 +4,13 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Shield, LogOut, Users, DollarSign, Search } from "lucide-react"
+import { Shield, LogOut, Users, DollarSign, Search, Edit } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import type { FraudReport } from "@/lib/types/database"
+import { EditReportModal } from "@/components/edit-report-modal"
 
 
 export function AdminDashboard() {
@@ -18,6 +19,8 @@ export function AdminDashboard() {
   const [reports, setReports] = useState<FraudReport[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [editingReport, setEditingReport] = useState<FraudReport | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Fetch reports from Supabase
   useEffect(() => {
@@ -65,12 +68,32 @@ export function AdminDashboard() {
     toast.success("সফলভাবে লগ আউট হয়েছে")
   }
 
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("en-BD", {
-      style: "currency",
-      currency: "BDT",
-      minimumFractionDigits: 0,
-    }).format(amount)
+  const handleEditReport = (report: FraudReport) => {
+    setEditingReport(report)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseEditModal = () => {
+    setEditingReport(null)
+    setIsEditModalOpen(false)
+  }
+
+  const handleUpdateReport = (updatedReport: FraudReport) => {
+    setReports(prev => 
+      prev.map(report => 
+        report.id === updatedReport.id ? updatedReport : report
+      )
+    )
+  }
+
+
+  const formatNumberInBengali = (num: number) => {
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯']
+    return num.toString().replace(/\d/g, (digit) => bengaliDigits[parseInt(digit)])
+  }
+
+  const formatAmountInBengali = (amount: number) => {
+    return `৳${formatNumberInBengali(amount)}`
   }
 
   const formatDate = (dateString: string) => {
@@ -112,7 +135,7 @@ export function AdminDashboard() {
                   <Users className="h-5 w-5 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-primary tabular-nums">{reports.length}</p>
+                  <p className="text-2xl font-bold text-primary">{formatNumberInBengali(reports.length)}</p>
                   <p className="text-sm text-muted-foreground">মোট রিপোর্ট</p>
                 </div>
               </div>
@@ -126,7 +149,7 @@ export function AdminDashboard() {
                   <DollarSign className="h-5 w-5 text-accent" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-accent tabular-nums">{formatAmount(totalAmount)}</p>
+                  <p className="text-2xl font-bold text-accent">{formatAmountInBengali(totalAmount)}</p>
                   <p className="text-sm text-muted-foreground">মোট পরিমাণ</p>
                 </div>
               </div>
@@ -203,16 +226,27 @@ export function AdminDashboard() {
                     className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg space-y-2 sm:space-y-0 hover:bg-muted/50 transition-colors duration-200 group"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="space-y-1">
+                    <div className="space-y-1 flex-1">
                       <p className="font-medium group-hover:text-primary transition-colors duration-200">{report.name}</p>
                       <p className="text-sm text-muted-foreground">{report.mobile_number}</p>
                       <p className="text-xs text-muted-foreground">{formatDate(report.created_at)}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-accent tabular-nums">{formatAmount(report.amount_bdt)}</p>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        রিপোর্ট #{report.id}
-                      </Badge>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="font-bold text-accent">{formatAmountInBengali(report.amount_bdt)}</p>
+                        <Badge variant="outline" className="text-xs mt-1">
+                          রিপোর্ট #{report.id}
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditReport(report)}
+                        className="h-8 w-8 p-0 hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
+                        aria-label={`রিপোর্ট #${report.id} সম্পাদনা করুন`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 ))
@@ -221,6 +255,14 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Report Modal */}
+      <EditReportModal
+        report={editingReport}
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onUpdate={handleUpdateReport}
+      />
     </div>
   )
 }

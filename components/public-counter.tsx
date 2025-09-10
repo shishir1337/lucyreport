@@ -11,6 +11,11 @@ interface CounterStats {
   lastUpdated: string
 }
 
+const formatNumberInBengali = (num: number) => {
+  const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯']
+  return num.toString().replace(/\d/g, (digit) => bengaliDigits[parseInt(digit)])
+}
+
 export function PublicCounter() {
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState<CounterStats>({
@@ -114,7 +119,7 @@ export function PublicCounter() {
               {isLoading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <span className="text-3xl font-bold text-primary tabular-nums animate-fade-in-up">{stats.totalReports}</span>
+                <span className="text-3xl font-bold text-primary animate-fade-in-up">{formatNumberInBengali(stats.totalReports)}</span>
               )}
             </div>
             <p className="text-sm font-medium text-primary">মোট রিপোর্ট জমা দেওয়া হয়েছে</p>
@@ -135,7 +140,7 @@ export function PublicCounter() {
             {isLoading ? (
               <Skeleton className="h-3 w-8" />
             ) : (
-              <span className="font-medium tabular-nums">{Math.min(100, Math.round((stats.totalReports / 300) * 100))}%</span>
+              <span className="font-medium">{formatNumberInBengali(Math.min(100, Math.round((stats.totalReports / 300) * 100)))}%</span>
             )}
           </div>
           <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">

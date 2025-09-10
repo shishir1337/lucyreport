@@ -35,7 +35,7 @@ export function AdminLogin() {
         toast.error("ভুল পাসওয়ার্ড")
         setPassword("")
       }
-    } catch (error) {
+    } catch {
       toast.error("লগইন ব্যর্থ। দয়া করে আবার চেষ্টা করুন।")
     } finally {
       setIsLoading(false)

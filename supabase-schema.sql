@@ -31,6 +31,14 @@ FOR INSERT
 TO anon 
 WITH CHECK (true);
 
+-- Create policy to allow public update access (for admin editing)
+CREATE POLICY "Allow public update access to fraud reports" 
+ON fraud_reports 
+FOR UPDATE 
+TO anon 
+USING (true) 
+WITH CHECK (true);
+
 -- Create a function to automatically update the updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
